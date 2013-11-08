@@ -121,7 +121,7 @@ int main()
 		IplImage* threshy = cvCreateImage(cvSize(752, 752), 8, 1);				//Threshed Image
 		IplImage* labelImg=cvCreateImage(cvSize(752, 752),IPL_DEPTH_LABEL,1);	//Image Variable for blobs
 
-		int xd1, xd2, yd1, yd2;				//Goalpost Coordinates
+		int xd, yd, xd1, xd2, yd1, yd2;				//Goalpost Coordinates
 
 		// //Getting the current frame
 		// getFrame(hCam, frame);
@@ -153,8 +153,12 @@ int main()
 			xd2 = it->second->maxx;
 			yd2 = it->second->maxy;
 
+           xd = (it->second->maxx+it->second->minx)/2;
+           yd = (it->second->maxy+it->second->miny)/2;
+
 			cvCircle(frame,cvPoint(xd1,yd1),2,CV_RGB(255,0,0),3);
 			cvCircle(frame,cvPoint(xd2,yd2),2,CV_RGB(255,0,0),3);
+            cvCircle(frame,cvPoint(xd,yd),2,CV_RGB(255,0,0),3);
 
 			xd1 = xd1 - 752/2;
 			yd1 = -yd1 + 752/2;
