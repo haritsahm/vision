@@ -12,3 +12,5 @@
 -	Take picture using the take picture program in the perpend orientation
 -	run the calculate_constants_perpend program to calculate the constants for the taken images
 -	run the linear_interpolation_perpend program to interpolate the missing values
+
+-try distortion correction factor as -6.1e-06
