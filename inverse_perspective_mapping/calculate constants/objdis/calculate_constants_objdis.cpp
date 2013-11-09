@@ -44,7 +44,7 @@ int diff[2];		//pixel differences*/
 int prev=0;			//required to remove the unwanted spikes in the graph made from the constants calculated
 					//using the images taken from the take picture code
 
-double ax = -7.1e-06;										//distortion constants at which the fisheye image looks linear*/
+double ax = -6.1e-06;										//distortion constants at which the fisheye image looks linear*/
 void getLinearCoords(int xd, int yd, int* xu, int* yu)		//function to convert image coordinates from distorted fisheye
 {															//image to image coordinates from undistorted linear image
 	double r2 = xd*xd +yd*yd;	

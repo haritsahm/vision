@@ -43,7 +43,7 @@ int diff[2];		//pixel differences
 
 int lut_no=0;
 
-double ax = -7.1e-06;
+double ax = -6.1e-06;
 void getLinearCoords(int xd, int yd, int* xu, int* yu)
 {
 	double r2 = xd*xd +yd*yd;	
