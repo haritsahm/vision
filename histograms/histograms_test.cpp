@@ -81,7 +81,7 @@ int main()
 		cvtColor(img_bgr,img_hsv,CV_BGR2HSV);	
 		// cout<<"\n2";					
 		//Thresholding the frame for yellow
-		inRange(img_hsv, Scalar(20, 100, 20), Scalar(50, 255, 255), threshy);					
+		inRange(img_hsv, Scalar(20, 100, 20), Scalar(70, 255, 255), threshy);					
 		// cvInRangeS(img_hsv, cvScalar(0, 120, 100), cvScalar(255, 255, 255), threshy);
 		//Filtering the frame - subsampling??
 		// smooth(threshy,threshy,CV_MEDIAN,7,7);
