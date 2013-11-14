@@ -43,7 +43,7 @@ int diff[2];		//pixel differences
 
 int lut_no=0;
 
-double ax = -6.1e-06;
+double ax = -7.1e-06;
 void getLinearCoords(int xd, int yd, int* xu, int* yu)
 {
 	double r2 = xd*xd +yd*yd;	
@@ -195,7 +195,7 @@ int main()
 					cvCvtColor(frame,img_hsv,CV_BGR2HSV);
 					//Thresholding the frame for yellow
 					//cvInRangeS(img_hsv, cvScalar(20, 100, 20), cvScalar(30, 255, 255), threshy);
-					cvInRangeS(img_hsv, cvScalar(0, 120, 100), cvScalar(255, 255, 255), threshy);
+					cvInRangeS(img_hsv, cvScalar(0, 100, 100), cvScalar(255, 255, 255), threshy);
 					//Filtering the frame - subsampling??
 					cvSmooth(threshy,threshy,CV_MEDIAN,7,7);						
 					
