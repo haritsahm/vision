@@ -29,7 +29,7 @@ int main()
         // Mat labelImg (Size(752,480),CV_8UC1);        //Image Variable for blobs
         IplImage* histogram= cvCreateImage(cvSize(752,480),8,3);                        //Image histograms
         Mat empty (Size(752,480),CV_8UC3); 
-        Mat histograms (Size(752,480),CV_8UC1);         //greyscale image for histogram       
+        Mat histograms (Size(752,480),CV_8UC1);         //greyscale image for histogram 
 
         
 
