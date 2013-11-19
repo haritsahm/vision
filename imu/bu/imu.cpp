@@ -139,17 +139,3 @@ void Imu::update()
     pitch = reply.getDataFloat(1*4);
     yaw = reply.getDataFloat(2*4);
 }
-
-double Imu::return_yaw()
-{
-	 if(!initialized)
-        return -1;
-    if (serial.waitForMessage(&reply, 0, 0, 1) != XRV_OK)
-    {
-        printf("Error reading from IMU\n");
-        return -1;
-    }
-
-    yaw = reply.getDataFloat(2*4);
-    return yaw;
-}

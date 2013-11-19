@@ -19,7 +19,6 @@ public:
 	};
 	bool init();
 	void update();
-	double return_yaw();
 	double roll, pitch, yaw;
 };
 #endif

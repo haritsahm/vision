@@ -53,7 +53,7 @@ bool Imu::init()
         case B230400: printf("230k4"); break;
         case B460800: printf("460k8"); break;
         case B921600: printf("921k6"); break;
-        default: printf("0x%lx", portInfo[i].m_baudrate);
+        default: printf("0x%u", portInfo[i].m_baudrate);
         }
         printf(" baud\n\n");
     }
@@ -143,11 +143,11 @@ void Imu::update()
 double Imu::return_yaw()
 {
 	 if(!initialized)
-        return;
+        return -1;
     if (serial.waitForMessage(&reply, 0, 0, 1) != XRV_OK)
     {
         printf("Error reading from IMU\n");
-        return;
+        return -1;
     }
 
     yaw = reply.getDataFloat(2*4);
