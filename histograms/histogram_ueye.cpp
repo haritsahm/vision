@@ -20,7 +20,7 @@ using namespace cv;
 char* imgPointer = NULL;
 int imgMemPointer;
 
-// enum CamError {CAM_SUCCESS = 1, CAM_FAILURE = 0};
+enum CamError {CAM_SUCCESS = 1, CAM_FAILURE = 0};
 
 CvScalar cColor = CV_RGB(255, 255, 255);
 CvScalar cColor1 = CV_RGB(255,0,0);
@@ -67,7 +67,7 @@ int setImgMem(HIDS hCam)
     {
         is_GetError (hCam, &err, &errMsg);
         printf("MemAlloc Unsuccessful %d: %s\n",err,errMsg);
-        return EXIT_FAILURE;
+        return CAM_FAILURE;
     }
 
     nRet = is_SetImageMem (hCam, imgPointer, imgMemPointer);
@@ -75,13 +75,13 @@ int setImgMem(HIDS hCam)
     {
         is_GetError (hCam, &err, &errMsg);
         printf("Could not set/activate image memory %d: %s\n",err, errMsg);
-        return EXIT_FAILURE;
+        return CAM_FAILURE;
     }
 
     return EXIT_SUCCESS;
 }
 
-void getFrame(HIDS hCam, Mat frame)
+bool getFrame(HIDS hCam, Mat frame)
 {
     char* errMsg = (char*)malloc(sizeof(char)*200);
     int err = 0;
@@ -92,12 +92,15 @@ void getFrame(HIDS hCam, Mat frame)
     {
         is_GetError (hCam, &err, &errMsg);
         printf("Could not grab image %d: %s\n",err,errMsg);
-        //return EXIT_FAILURE;
+        return CAM_FAILURE;
     }
-        
+    else
+    {
+        memcpy(frame.data, imgPointer, 752*480 * 3);
+        return CAM_SUCCESS;  
+    }      
     //fill in the OpenCV imaga data 
-    //IplImage* img_rgb = cvCreateImage(cvSize(752,480),8,3);
-    memcpy(frame.data, imgPointer, 752*480 * 3);
+    //IplImage* img_rgb = cvCreateImage(cvSize(752,480),8,3)
     //img_rgb->imageData = imgPointer;
     //return img_rgb;
 }
@@ -117,26 +120,25 @@ int main()
          //INITIALIZE CAMERA
         HIDS hCam = 1;
         initializeCam(hCam);
-        setImgMem(hCam);
-
-        //Image Variables
-        Mat frame (Size(752,480),CV_8UC3);
-        Mat img_bgr (Size(752,480),CV_8UC3);
-        Mat img_hsv (Size(752,480),CV_8UC3);                        //Image in HSV color space
-        Mat threshy (Size(752,480),CV_8UC1);                                //Threshed Image
-        // Mat labelImg (Size(752,480),CV_8UC1);        //Image Variable for blobs
-        IplImage* histogram= cvCreateImage(cvSize(752,480),8,3);                        //Image histograms
-        Mat histograms (Size(752,480),CV_8UC1);         //greyscale image for histogram
-        Mat empty (Size(752,1),CV_8UC1);   
-        Mat img (Size(752,1),CV_8UC1);               //image colours (histogram)       
-
-        
+        setImgMem(hCam); 
+         //Image Variables
+                Mat frame = Mat(Size(752,480),CV_8UC3);
+                // Mat img_bgr (Size(752,480),CV_8UC3);
+                Mat img_hsv = Mat(Size(752,480),CV_8UC3);                        //Image in HSV color space
+                Mat threshy = Mat(Size(752,480),CV_8UC1);                                //Threshed Image
+                // Mat labelImg (Size(752,480),CV_8UC1);        //Image Variable for blobs
+                IplImage* histogram= cvCreateImage(cvSize(752,480),8,3);                        //Image histograms
+                // Mat histograms (Size(752,480),CV_8UC1);         //greyscale image for histogram
+                Mat empty = Mat(Size(752,1),CV_8UC1);   
+                Mat img = Mat(Size(752,1),CV_8UC1);               //image colours (histogram)       
 
         // CvBlobs blobs;
         
         while(1)
         {
-                getFrame(hCam,frame);
+
+                if(getFrame(hCam,frame) == CAM_FAILURE)
+                    continue;
                 // cam.RetrieveBuffer(&rawImage);
                 // memcpy(frame.data, rawImage.GetData(), rawImage.GetDataSize());
                 // histogram = empty.clone();
@@ -192,7 +194,8 @@ int main()
                     cvLine(histogram,prev,next,cColor);
                     prev = next;
                 }
-                // printf("%n\n", &threshold);
+                // printf("%n\n",histograms &threshold);
+                int counter  = 0;
                 for(int i=0;i<752;++i)
                 {
                     if(img.at<uchar>(0,i)>threshold)
@@ -200,7 +203,9 @@ int main()
                         int peak = 0;
                         int color = 0;
                         while(1)
-                        {
+                        {                     
+                            if(i>=752)
+                                break;
                             if(img.at<uchar>(0,i)<threshold)
                                 break;
                             if(img.at<uchar>(0,i)>color)
@@ -211,6 +216,11 @@ int main()
                             ++i;
                         }
                         line(frame,cvPoint(peak,0),cvPoint(peak,480),cColor1);
+                        ++counter;
+                        if(counter == 1)
+                            putText(frame, "GP1", cvPoint(peak,240), FONT_HERSHEY_SIMPLEX, 0.3, cvScalar(255,255,0), 1, CV_AA);
+                        if(counter == 2)
+                             putText(frame, "GP2", cvPoint(peak,240), FONT_HERSHEY_SIMPLEX, 0.3, cvScalar(255,255,0), 1, CV_AA);
                     }
                 }
 
@@ -224,14 +234,15 @@ int main()
 
                 if(c == 27)
                     break;
-        }
 
-        //Cleanup
+        }
+        exitCam(hCam);
+        // Cleanup
         // cvReleaseImage(&frame);
         // cvReleaseImage(&threshy);
         // cvReleaseImage(&img_hsv);
         // cvReleaseImage(&labelImg);
         // cvReleaseImage(&histogram);
-        cvDestroyAllWindows();
+        // cvDestroyAllWindows();
         return 0;
 }

@@ -249,7 +249,7 @@ int main()
 
     IplImage* bgr_frame=cvCreateImage(cvSize(752, 480), 8, 3);//fisheye image
 
-set_moving_speed(id,100);
+    set_moving_speed(id,100);
 
     for(int i=609;i<810;++i)			//for loop moves motor for each and every motor location and capture pictures
     {									//that will be later used calculate the constants for the fisheye lens for 

@@ -130,7 +130,7 @@ int main()
         // Mat img_bgr (Size(752,480),CV_8UC3);
         IplImage* img_hsv = cvCreateImage(cvSize(752,480),8,3);                        //Image in HSV color space
         IplImage* threshy = cvCreateImage(cvSize(752,480),8,1);                                //Threshed Image
-        IplImage* labelImg = cvCreateImage(cvSize(752,480),8,1);        //Image Variable for blobs
+        // IplImage* labelImg = cvCreateImage(cvSize(752,480),8,1);        //Image Variable for blobs
         IplImage* histogram= cvCreateImage(cvSize(752,480),8,3);                        //Image histograms
         // IplImage* histograms = cvCreateImage(cvSize(752,480),8,1);         //greyscale image for histogram
         IplImage* empty = cvCreateImage(cvSize(752,1),8,1);   
@@ -142,6 +142,7 @@ int main()
         
         while(1)
         {
+            // printf("1\n");
                 getFrame(hCam,frame);
                 // cam.RetrieveBuffer(&rawImage);
                 // memcpy(frame.data, rawImage.GetData(), rawImage.GetDataSize());
@@ -179,16 +180,18 @@ int main()
 
                 for(int x=0;x<752;++x)
                 {
-                        // IplImage* col = cvGetCol(threshy,col,x);
-                        IplImage* copy = cvCreateImage(cvSize(752,480),8,1);
-                        cvCopy(copy,threshy);
-                        // cvSetImageROI(copy,cvRect(x,0,x+1,480));
+                    // printf("%d\n", x);
+                    // printf("2\n");
+                        cvSetImageROI(threshy,cvRect(x,0,1,480));
+                        IplImage* copy = cvCreateImage(cvGetSize(threshy),8,1);
+                        cvCopy(threshy,copy,NULL);
+                        cvResetImageROI(threshy);
                         int y = cvCountNonZero(copy);
-                        if(max<y)
+                        if(max<=y)
                             max=y;
                         // for(int j=0 ;j<img.rows;++j)
                             // img.at<uchar>(0,x) = y;
-                        returnPixel1C(img,0,x) = y;
+                        returnPixel1C(img,x,0) = y;
                         CvPoint next = cvPoint(x,480-y);
                         // cvLine(histogram,prev,next,cColor);
                         // // cvCircle(histogram,next,2,cColor,3);
@@ -204,7 +207,8 @@ int main()
 
                 for(int i=0;i<752;++i)
                 {
-                    int color = returnPixel1C(img,0,i);
+                    // printf("3\n");
+                    int color = returnPixel1C(img,i,0);
                     CvPoint next = cvPoint(i,480-color);
                     cvLine(histogram,prev,next,cColor);
                     prev = next;
@@ -212,19 +216,23 @@ int main()
                 // printf("%n\n", &threshold);
                 for(int i=0;i<752;++i)
                 {
+                    // printf("4\n");
                     int counter=0;
-                    if(returnPixel1C(img,0,i)>threshold)
+                    if(returnPixel1C(img,i,0)>threshold)
                     {
                         int peak = 0;
                         int color = 0;                        
                         while(1)
                         {
-                            if(returnPixel1C(img,0,i)<threshold)
+                            // printf("5\n");
+                            if(i>=752)
                                 break;
-                            if(returnPixel1C(img,0,i)>color)
+                            if(returnPixel1C(img,i,0)<threshold)
+                                break;
+                            if(returnPixel1C(img,i,0)>color)
                             {
                                 peak = i;
-                                color = returnPixel1C(img,0,i);
+                                color = returnPixel1C(img,i,0);
                             }
                             ++i;
                         }
@@ -244,13 +252,14 @@ int main()
 
                 if(c == 27)
                     break;
+                // printf("6\n");
         }
-
+        exitCam(hCam);
         // Cleanup
         cvReleaseImage(&frame);
         cvReleaseImage(&threshy);
         cvReleaseImage(&img_hsv);
-        cvReleaseImage(&labelImg);
+        // cvReleaseImage(&labelImg);
         cvReleaseImage(&histogram);
         cvDestroyAllWindows();
         return 0;
