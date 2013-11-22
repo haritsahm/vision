@@ -8,11 +8,10 @@
 #include <stdio.h>
 //Blob Library Headers
 #include <cvblob.h>
+#include <cmath>
 
 #include <ueye.h>
 #define returnPixel1C(image, x, y) ((uchar*)(image->imageData + image->widthStep*(y)))[x]
-
-// #include <flycapture/FlyCapture2.h>
 
 using namespace std;
 using namespace cvb;
@@ -128,13 +127,13 @@ int main()
         //Image Variables
         IplImage* frame = cvCreateImage(cvSize(752,480),8,3);
         // Mat img_bgr (Size(752,480),CV_8UC3);
-        IplImage* img_hsv = cvCreateImage(cvSize(752,480),8,3);                        //Image in HSV color space
-        IplImage* threshy = cvCreateImage(cvSize(752,480),8,1);                                //Threshed Image
-        // IplImage* labelImg = cvCreateImage(cvSize(752,480),8,1);        //Image Variable for blobs
-        IplImage* histogram= cvCreateImage(cvSize(752,480),8,3);                        //Image histograms
-        // IplImage* histograms = cvCreateImage(cvSize(752,480),8,1);         //greyscale image for histogram
+        IplImage* img_hsv = cvCreateImage(cvSize(752,480),8,3); //Image in HSV color space
+        IplImage* threshy = cvCreateImage(cvSize(752,480),8,1); //Threshed Image
+        // IplImage* labelImg = cvCreateImage(cvSize(752,480),8,1); //Image Variable for blobs
+        IplImage* histogram= cvCreateImage(cvSize(752,480),8,3);    //Image histograms
+        // IplImage* histograms = cvCreateImage(cvSize(752,480),8,1);   //greyscale image for histogram
         IplImage* empty = cvCreateImage(cvSize(752,1),8,1);   
-        IplImage* img = cvCreateImage(cvSize(752,1),8,1);               //image colours (histogram)       
+        IplImage* img = cvCreateImage(cvSize(752,1),8,1);   //image colours (histogram)       
 
         
 
@@ -153,11 +152,15 @@ int main()
                 // // cvAddS(frame, cvScalar(70,70,70), frame);
                 // // cvtColor(frame,img_bgr,CV_BayerBG2BGR);
                 // // cout<<"\n1";
-                cvCvtColor(frame,img_hsv,CV_BGR2HSV);        
+                cvCvtColor(frame,img_hsv,CV_BGR2HSV);
+                // cvCvtColor(frame,img_hsv,CV_BGR2YUV);        
                 // // cout<<"\n2";                                        
                 // //Thresholding the frame for yellow
                 // // inRange(img_hsv, Scalar(10, 135, 20), Scalar(255, 199, 120), threshy); 
-                cvInRangeS(img_hsv, cvScalar(0, 150, 90), cvScalar(120, 242, 255), threshy);                                       
+                cvInRangeS(img_hsv, cvScalar(0, 150, 90), cvScalar(120, 242, 255), threshy);
+                // cvInRangeS(img_hsv, cvScalar(45, 133, 70), cvScalar(117, 160, 115), threshy);
+                cvErode(threshy,threshy);
+                cvDilate(threshy,threshy);                                     
                 // // cvInRangeS(img_hsv, cvScalar(0, 120, 100), cvScalar(255, 255, 255), threshy);
                 // // Filtering the frame - subsampling??
                 // cvSmooth(threshy,threshy,CV_MEDIAN,7,7);
@@ -180,40 +183,32 @@ int main()
 
                 for(int x=0;x<752;++x)
                 {
-                    // printf("%d\n", x);
-                    // printf("2\n");
-                        cvSetImageROI(threshy,cvRect(x,0,1,480));
-                        IplImage* copy = cvCreateImage(cvGetSize(threshy),8,1);
-                        cvCopy(threshy,copy,NULL);
-                        cvResetImageROI(threshy);
-                        int y = cvCountNonZero(copy);
-                        if(max<=y)
-                            max=y;
-                        // for(int j=0 ;j<img.rows;++j)
-                            // img.at<uchar>(0,x) = y;
-                        returnPixel1C(img,x,0) = y;
-                        CvPoint next = cvPoint(x,480-y);
-                        // cvLine(histogram,prev,next,cColor);
-                        // // cvCircle(histogram,next,2,cColor,3);
-                        // prev=next;
+                    cvSetImageROI(threshy,cvRect(x,0,1,480));
+                    IplImage* copy = cvCreateImage(cvGetSize(threshy),8,1);
+                    cvCopy(threshy,copy,NULL);
+                    cvResetImageROI(threshy);
+                    int y = cvCountNonZero(copy);
+                    if(max<=y)
+                        max=y;
+                    returnPixel1C(img,x,0) = y;
+                    CvPoint next = cvPoint(x,480-y);
                 }
 
                 threshold = max/5;
                 cvLine(histogram,cvPoint(0,480-threshold),cvPoint(752,480-threshold),cColor1);
-
-                // GaussianBlur(img, img, Size(5, 5), 1.2, 1.2);
                 cvSmooth(img,img);
 
 
                 for(int i=0;i<752;++i)
                 {
-                    // printf("3\n");
                     int color = returnPixel1C(img,i,0);
                     CvPoint next = cvPoint(i,480-color);
                     cvLine(histogram,prev,next,cColor);
                     prev = next;
                 }
-                // printf("%n\n", &threshold);
+
+                int gpx1 = 0,gpx2 = 0;
+                
                 for(int i=0;i<752;++i)
                 {
                     // printf("4\n");
@@ -224,7 +219,6 @@ int main()
                         int color = 0;                        
                         while(1)
                         {
-                            // printf("5\n");
                             if(i>=752)
                                 break;
                             if(returnPixel1C(img,i,0)<threshold)
@@ -239,8 +233,33 @@ int main()
                         cvLine(frame,cvPoint(peak,0),cvPoint(peak,480),cColor1);
                         // cvCircle(frame, cvPoint(peak,gpy), 2, cColor, 2);
                         counter++;
+                        if(counter == 1 && peak <= 752)
+                            gpx1 = peak;
+                        if(counter == 2 && peak <= 752)
+                            gpx2 = peak;
+                        else if(counter > 2 && peak <= 752)
+                        {
+                            if(peak >= gpx1 && peak <= 752)
+                            {
+                                gpx1 = peak;
+                                peak = 0;
+                            }
+                            if(peak >= gpx2 && peak <= gpx1 && peak <= 752)
+                            {
+                                gpx2 = peak;
+                                peak = 0;
+                            }
+                        }
                     }
                 }
+                // printf("%d\n", gpx1);
+                // printf("%d\n", gpx2);
+                // printf("1\n");
+                //CONVERTING INTO TWO SEPARATE BLOBS
+                cvSetImageROI(threshy,cvRect(int((3*gpx1+gpx2)/4),0,int(abs(gpx1-gpx2)/10),480));
+                // printf("2\n");
+                cvZero(threshy);
+                cvResetImageROI(threshy);
 
                 //Showing the images
                 cvShowImage("Live",frame);
@@ -249,10 +268,8 @@ int main()
                 cvShowImage("Histogram",histogram);
 
                 int c= cvWaitKey(50);
-
                 if(c == 27)
                     break;
-                // printf("6\n");
         }
         exitCam(hCam);
         // Cleanup
