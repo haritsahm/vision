@@ -184,14 +184,14 @@ int main()
                 for(int x=0;x<752;++x)
                 {
                     cvSetImageROI(threshy,cvRect(x,0,1,480));
-                    IplImage* copy = cvCreateImage(cvGetSize(threshy),8,1);
-                    cvCopy(threshy,copy,NULL);
+                    // IplImage* copy = cvCreateImage(cvGetSize(threshy),8,1);
+                    // cvCopy(threshy,copy,NULL);
+                    int y = cvCountNonZero(threshy);
                     cvResetImageROI(threshy);
-                    int y = cvCountNonZero(copy);
                     if(max<=y)
                         max=y;
                     returnPixel1C(img,x,0) = y;
-                    CvPoint next = cvPoint(x,480-y);
+                    // CvPoint next = cvPoint(x,480-y);
                 }
 
                 threshold = max/5;
@@ -208,56 +208,48 @@ int main()
                 }
 
                 int gpx1 = 0,gpx2 = 0;
-                
+                int pixels_at_gpx1 = 0,pixels_at_gpx2 = 0;
                 for(int i=0;i<752;++i)
                 {
-                    // printf("4\n");
-                    int counter=0;
                     if(returnPixel1C(img,i,0)>threshold)
                     {
-                        int peak = 0;
-                        int color = 0;                        
+                        int peak_x = 0;
+                        int pixels_at_x = 0;                        
                         while(1)
                         {
                             if(i>=752)
                                 break;
                             if(returnPixel1C(img,i,0)<threshold)
                                 break;
-                            if(returnPixel1C(img,i,0)>color)
+                            if(returnPixel1C(img,i,0)>pixels_at_x)
                             {
-                                peak = i;
-                                color = returnPixel1C(img,i,0);
+                                peak_x = i;
+                                pixels_at_x = returnPixel1C(img,i,0);
                             }
                             ++i;
                         }
-                        cvLine(frame,cvPoint(peak,0),cvPoint(peak,480),cColor1);
-                        // cvCircle(frame, cvPoint(peak,gpy), 2, cColor, 2);
-                        counter++;
-                        if(counter == 1 && peak <= 752)
-                            gpx1 = peak;
-                        if(counter == 2 && peak <= 752)
-                            gpx2 = peak;
-                        else if(counter > 2 && peak <= 752)
+                        if(pixels_at_x >= pixels_at_gpx1)     //COMPARING COLOR SO THAT ONLY THE TWO PEAKS WITH MAX WHITE REGION ARE CONSIDERED AS GOAL POSTS
                         {
-                            if(peak >= gpx1 && peak <= 752)
-                            {
-                                gpx1 = peak;
-                                peak = 0;
-                            }
-                            if(peak >= gpx2 && peak <= gpx1 && peak <= 752)
-                            {
-                                gpx2 = peak;
-                                peak = 0;
-                            }
+                            gpx2 = gpx1;
+                            pixels_at_gpx2 = pixels_at_gpx1;
+                            gpx1 = peak_x;
+                            pixels_at_gpx1 = pixels_at_x;
+                        }
+
+                        else if (pixels_at_x < pixels_at_gpx1 && pixels_at_x >=pixels_at_gpx2)
+                        {
+                            gpx2 = peak_x;
+                            pixels_at_gpx2 = pixels_at_x;
                         }
                     }
                 }
+                cvLine(frame,cvPoint(gpx1,0),cvPoint(gpx1,480),cColor1);
+                cvLine(frame,cvPoint(gpx2,0),cvPoint(gpx2,480),cColor1);
                 // printf("%d\n", gpx1);
                 // printf("%d\n", gpx2);
                 // printf("1\n");
                 //CONVERTING INTO TWO SEPARATE BLOBS
                 cvSetImageROI(threshy,cvRect(int((3*gpx1+gpx2)/4),0,int(abs(gpx1-gpx2)/10),480));
-                // printf("2\n");
                 cvZero(threshy);
                 cvResetImageROI(threshy);
 
