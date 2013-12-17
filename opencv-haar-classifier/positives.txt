@@ -1,0 +1,8 @@
+./positive_images/1.bmp
+./positive_images/4.bmp
+./positive_images/7.bmp
+./positive_images/6.bmp
+./positive_images/5.bmp
+./positive_images/8.bmp
+./positive_images/3.bmp
+./positive_images/2.bmp

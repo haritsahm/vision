@@ -1,0 +1,7 @@
+./samples/8.bmp.vec
+./samples/6.bmp.vec
+./samples/5.bmp.vec
+./samples/4.bmp.vec
+./samples/1.bmp.vec
+./samples/7.bmp.vec
+./samples/3.bmp.vec
