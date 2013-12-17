@@ -25,7 +25,7 @@ char* imgPointer = NULL;
 int imgMemPointer;
 
 typedef unsigned char byte;
-#define serialusb2d "A900fDpz"//"A800d2dg"//"A7003N1d"// "AD025JOH"//"A4007rXR"//"A7003N1d"//"A4007sgG"//"A900fDpz"//"A7003N1d"////"A900fDhp"//"A900fDpA"//"A900fDhp"//"A900fDhp"
+#define serialusb2d "A4007rXO"//"A800d2dg"//"A7003N1d"// "AD025JOH"//"A4007rXR"//"A7003N1d"//"A4007sgG"//"A900fDpz"//"A7003N1d"////"A900fDhp"//"A900fDpA"//"A900fDhp"//"A900fDhp"
 
 struct ftdi_context ftdic1;
 
@@ -249,12 +249,14 @@ int main()
 
     IplImage* bgr_frame=cvCreateImage(cvSize(752, 480), 8, 3);//fisheye image
 
-    set_moving_speed(id,100);
+    set_moving_speed(id,100);    
 
     for(int i=609;i<810;++i)			//for loop moves motor for each and every motor location and capture pictures
     {									//that will be later used calculate the constants for the fisheye lens for 
+        // set_moving_speed(id,100);
         set_goal_pos(id,512);        	//for each and every angle the head motor will be allowed to move
-        usleep(3000000);        
+        usleep(3000000);
+        // set_moving_speed(id,100);        
         set_goal_pos(id,i);        
         usleep(3000000);
         int g=read_position(id);

@@ -127,8 +127,8 @@ int main()
     // getFrame(hCam,frame);
     // cvtColor(frame,img_scene,CV_BGR2GRAY);
     // imwrite("testcase.bmp",frame);
-    Mat img_object = imread( "acyut1.png", CV_LOAD_IMAGE_GRAYSCALE );
-    Mat img_scene = imread( "acyut2.png", CV_LOAD_IMAGE_GRAYSCALE );
+    Mat img_object = imread( "bitslogo.png", CV_LOAD_IMAGE_GRAYSCALE );
+    Mat img_scene = imread( "poster.JPG", CV_LOAD_IMAGE_GRAYSCALE );
 
     if( !img_object.data || !img_scene.data )
     { std::cout<< " --(!) Error reading images " << std::endl; return -1; }
@@ -212,7 +212,10 @@ int main()
     imshow( "Good Matches & Object detection", img_matches );
     int c = cvWaitKey(1000);
     if(c == 27)
+    {
+        imwrite("dit.png",img_matches);
       break;
+    }
   }
 
     // waitKey(100);
