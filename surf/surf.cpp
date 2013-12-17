@@ -129,6 +129,7 @@ int main()
     // imwrite("testcase.bmp",frame);
     Mat img_object = imread( "bitslogo.png", CV_LOAD_IMAGE_GRAYSCALE );
     Mat img_scene = imread( "poster.JPG", CV_LOAD_IMAGE_GRAYSCALE );
+    flip(img_scene,img_scene,1);
 
     if( !img_object.data || !img_scene.data )
     { std::cout<< " --(!) Error reading images " << std::endl; return -1; }
