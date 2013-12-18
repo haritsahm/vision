@@ -110,7 +110,7 @@ int main()
     HIDS hCam = 1;
     initializeCam(hCam);
     setImgMem(hCam);
-    IplImage* bgr_frame=cvCreateImage(cvSize(752, 480), 8, 3);//fisheye image
+    IplImage* bgr_frame=cvCreateImage(cvSize(752, 480), 8, 3);      //fisheye image
     int pic =1;
     while(1)
     {
@@ -119,12 +119,15 @@ int main()
         cvLine(bgr_frame,cvPoint(356,260),cvPoint(396,260),cvScalar(255,0,0));
         cvLine(bgr_frame,cvPoint(356,220),cvPoint(356,260),cvScalar(255,0,0));
         cvLine(bgr_frame,cvPoint(396,220),cvPoint(396,260),cvScalar(255,0,0));
-    	char imgcounter[50]="positive_images/";
+    	char imgcounter[50]="negative_images/";
 		string picnumber = static_cast<ostringstream*>( &(ostringstream() << pic) )->str();
 		const char * d = picnumber.c_str();
 		strcat(imgcounter,d);            
 		strcat(imgcounter,".bmp");
-		cvShowImage("LIVE",bgr_frame);
+        CvFont font;
+        cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.4, 0.4, 0, 1, 8);
+        cvPutText(bgr_frame,imgcounter,cvPoint(10,10),&font,cvScalar(255,255,0));
+        cvShowImage("LIVE",bgr_frame);
 
 		int c = cvWaitKey(100);
 		if(c == int('s'))
@@ -133,9 +136,6 @@ int main()
 			cvSaveImage(imgcounter,bgr_frame);
             cvResetImageROI(bgr_frame);
             printf("SAVED %d\n",pic);
-            CvFont font;
-            cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.4, 0.4, 0, 1, 8);
-            cvPutText(bgr_frame,imgcounter,cvPoint(10,10),&font,cvScalar(255,255,0));
 			++pic;
 		}
         if(c == 27)

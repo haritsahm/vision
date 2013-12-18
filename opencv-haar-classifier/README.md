@@ -53,7 +53,7 @@ OpenCV, and save the results to `./classifier`:
 
         opencv_traincascade -data classifier -vec samples.vec -bg negatives.txt\
           -numStages 20 -minHitRate 0.999 -maxFalseAlarmRate 0.5 -numPos 8\
-          -numNeg 60 -w 40 -h 40 -mode ALL -precalcValBufSize 1024\
+          -numNeg 100 -w 40 -h 40 -mode ALL -precalcValBufSize 1024\
           -precalcIdxBufSize 1024
 
 9. Wait until the process is finished (which takes a long time — a couple of
@@ -64,7 +64,7 @@ days probably, depending on the computer you have and how big your images are).
         cd ~/opencv-2.4.6.1/samples/c
         chmod +x build_all.sh
         ./build_all.sh
-        ./facedetect --cascade="~/finished_classifier.xml"
+        ./facedetect --cascade="x-t.xml"
 
 
 ## Acknowledgements
