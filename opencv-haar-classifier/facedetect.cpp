@@ -31,8 +31,8 @@ void detectAndDraw( Mat& img, CascadeClassifier& cascade,
                     CascadeClassifier& nestedCascade,
                     double scale, bool tryflip );
 
-string cascadeName = "haarcascade_frontalface_alt.xml";
-string nestedCascadeName = "haarcascade_eye_tree_eyeglasses.xml";
+string cascadeName = "../../data/haarcascades/haarcascade_frontalface_alt.xml";
+string nestedCascadeName = "../../data/haarcascades/haarcascade_eye_tree_eyeglasses.xml";
 
 int main( int argc, const char** argv )
 {
