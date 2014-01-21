@@ -143,18 +143,20 @@ int main()
                         returnPixel1C(threshy,i,j) = 0;
                 }
         }
-        CvMemStorage* storage = cvCreateMemStorage(0);
-        CvSeq* results = cvHoughCircles(threshy,storage,CV_HOUGH_GRADIENT,1,threshy->width/10,100,20,0,100);
-        for( int i = 0; i < results->total; i++ ) 
+        CvMemStorage* compstorage;
+        compstorage = cvCreateMemStorage(0);
+        CvContour* contours;
+        cvFindContours( threshy, compstorage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE );
+        for( int i = 0; i < contours->total; i++ ) 
         {
-            float* p = (float*) cvGetSeqElem( results, i );
-            CvPoint pt = cvPoint( cvRound( p[0] ), cvRound( p[1] ) );
-            cvCircle(frame,pt,5,cvScalar(255,255,0),2,8);
-            cvCircle(frame,pt,cvRound( p[2] ),CV_RGB(0,0,255),CV_FILLED);
-            printf("FOUND\n");
+            double xc, yc, rc;
+            double rMajor, rMinor;
+            fitEllipse(contours,&xc,&yc,&rMajor,&rMinor);
+            rc = rMajor;
+            cvEllipse(frame,cvPoint(xc,yc),cvSize(rMajor,rMinor),0,0,360,cvScalar(255,255,0));
         }
 
-        cvClearMemStorage(storage);
+        cvClearMemStorage(compstorage);
 
         cvShowImage("frame",frame);
         cvShowImage("threshed",threshy);
