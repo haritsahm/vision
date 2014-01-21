@@ -1,16 +1,16 @@
 /******************README******************/
 
 -	First take pictures using the take picture program in the objdis orientation
--	change permissions for the image files using the command
+-	Change permissions for the image files using the command
 	`sudo chmod -R 777 <Folder Name goes here>
--	use the `ls -ltr` command to get the file list
--	save this file as `filenames_objdis.txt`
--	run the calculate_constants_objdis program to calculate the constants for the taken images
--	run the linear_interpolation_objdis program to interpolate the values which were not calculated
--	repeat above for as many files you like
--	run average_constants program to calculate the average constants values for every single motor location
+-	Use the `ls -ltr` command to get the file list
+-	Save this file as `filenames_objdis.txt`
+-	Run the calculate_constants_objdis program to calculate the constants for the taken images
+-	Run the linear_interpolation_objdis program to interpolate the values which were not calculated
+-	Repeat above for as many files you like
+-	Run average_constants program to calculate the average constants values for every single motor location
 -	Take picture using the take picture program in the perpend orientation
--	run the calculate_constants_perpend program to calculate the constants for the taken images
--	run the linear_interpolation_perpend program to interpolate the missing values
+-	Run the calculate_constants_perpend program to calculate the constants for the taken images
+-	Run the linear_interpolation_perpend program to interpolate the missing values
 
 -try distortion correction factor as -6.1e-06
