@@ -15,10 +15,10 @@
 #include <cvblob.h>
 
 //Definitions
-#define WIDTHd 752
-#define HEIGHTd 480
-#define HEIGHTu 752
-#define WIDTHu 480
+#define WIDTHd 376
+#define HEIGHTd 240
+#define HEIGHTu 376
+#define WIDTHu 240
 #define PI 3.14159265359
 #define rad2deg(x) x*180/PI
 //NameSpaces
@@ -43,7 +43,7 @@ int diff[2];		//pixel differences
 
 int lut_no=0;
 
-double ax = -8.1e-06;
+double ax = -7.1e-06;
 void getLinearCoords(int xd, int yd, int* xu, int* yu)
 {
 	double r2 = xd*xd +yd*yd;	
@@ -133,9 +133,9 @@ int main()
 
 	//Image Variables
 	// IplImage* frame;
-	IplImage* img_hsv=cvCreateImage(cvSize(752, 480), 8, 3);//Image in HSV color space
-	IplImage* threshy = cvCreateImage(cvSize(752, 480), 8, 1);//Threshed Image
-	IplImage* labelImg=cvCreateImage(cvSize(752, 480),IPL_DEPTH_LABEL,1);//Image Variable for blobs
+	IplImage* img_hsv=cvCreateImage(cvSize(376, 240), 8, 3);//Image in HSV color space
+	IplImage* threshy = cvCreateImage(cvSize(376, 240), 8, 1);//Threshed Image
+	IplImage* labelImg=cvCreateImage(cvSize(376, 240),IPL_DEPTH_LABEL,1);//Image Variable for blobs
 
 	
 
@@ -210,8 +210,8 @@ int main()
 					{			
 						xd = (it->second->maxx+it->second->minx)/2;
 						yd = (it->second->maxy+it->second->miny)/2;
-						xd = xd - 752/2;
-						yd = -yd + 480/2;
+						xd = xd - 376/2;
+						yd = -yd + 240/2;
 						// cout<<"non-linear coords: xd="<<xd<<"     yd="<<yd<<endl;
 						getLinearCoords(xd, yd, &xu, &yu);
 						XU[i]=xu;
