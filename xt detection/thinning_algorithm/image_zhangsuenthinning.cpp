@@ -28,7 +28,8 @@ void thinningZhangSuenIteration(IplImage* im, int iter)                         
 {                                                                                           //one for even iter and one for odd both must be executed
     IplImage* marker = cvCreateImage(cvGetSize(im),8,1);
     cvZero(marker);
-    number_of_deletions = 0;
+    if(!iter)
+        number_of_deletions = 0;
     for (int i = 1; i < im->height; i++)
     {
         for (int j = 1; j < im->width; j++)
@@ -88,12 +89,12 @@ int main(int argc, char const *argv[])
 	{
 		if(!number_of_deletions)
 			break;
-		// printf("number_of_iterations: %d\n", i+1);
-        printf("number_of_deletions: %d\n", number_of_deletions);
+        printf("number_of_iterations: %d number_of_deletions: %d\n", i+1, number_of_deletions);
 		thinningZhangSuenIteration(frame,0);                                                  //even sub-iteration
 		thinningZhangSuenIteration(frame,1);                                                  //odd sub-iteration
 	}
-	string str(argv[1]);
+
+	string str(argv[1]);                                                                      //saving image
 	int i;
 	for (i = 0; i < strlen(argv[1]); ++i)
 		if(argv[1][i] == '.')
