@@ -34,7 +34,6 @@ void thinningZhangSuenIteration(IplImage* im, int iter)                         
     {
         for (int j = 1; j < im->width; j++)
         {
-            // printf("i: %d j: %d\n", i, j);
             int p2 = returnPixel1C(im,i-1, j)/255;                                          //image here is either 255 or 0 hence converted to either 0 or 1
             int p3 = returnPixel1C(im,i-1, j+1)/255;
             int p4 = returnPixel1C(im,i, j+1)/255;
@@ -54,7 +53,6 @@ void thinningZhangSuenIteration(IplImage* im, int iter)                         
 
             if (A == 1 && (B >= 2 && B <= 6) && m1 == 0 && m2 == 0)
             {
-                // printf("deleting %d %d\n", i,j);
                 returnPixel1C(marker,i,j) = 255;                                            //marking pixels to be deleted
                 number_of_deletions++;
             }
