@@ -1,7 +1,7 @@
 all: single_line
 
 single_line: single_line.cpp
-	g++ -o single_line single_line.cpp `pkg-config --libs opencv cvblob` -lueye_api -lm
+	g++ -fpermissive -o single_line single_line.cpp `pkg-config --libs opencv cvblob` -lueye_api -lm
 
 clean:
 	rm -rf single_line

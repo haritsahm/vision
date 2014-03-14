@@ -11,6 +11,8 @@
 
 #include <ueye.h>
 
+// #include <flycapture/FlyCapture2.h>
+
 using namespace std;
 using namespace cvb;
 using namespace cv;
@@ -19,6 +21,9 @@ char* imgPointer = NULL;
 int imgMemPointer;
 
 enum CamError {CAM_SUCCESS = 1, CAM_FAILURE = 0};
+
+CvScalar cColor = CV_RGB(255, 255, 255);
+CvScalar cColor1 = CV_RGB(255,0,0);
 
 int initializeCam(HIDS hCam)
 {   
@@ -76,7 +81,7 @@ int setImgMem(HIDS hCam)
     return EXIT_SUCCESS;
 }
 
-bool getFrame(HIDS hCam, IplImage* frame)
+bool getFrame(HIDS hCam, Mat frame)
 {
     char* errMsg = (char*)malloc(sizeof(char)*200);
     int err = 0;
@@ -91,7 +96,7 @@ bool getFrame(HIDS hCam, IplImage* frame)
     }
     else
     {
-        memcpy(frame->imageData, imgPointer, 752*480 * 3);
+        memcpy(frame.data, imgPointer, 752*480 * 3);
         return CAM_SUCCESS;  
     }      
     //fill in the OpenCV imaga data 
@@ -109,6 +114,7 @@ int exitCam(HIDS hCam)
         return EXIT_FAILURE;
     }
 }
+
 typedef unsigned char uchar;
 #define returnPixel1C(image, x, y) ((uchar*)(image->imageData + image->widthStep*(y)))[x]
 
@@ -126,46 +132,60 @@ int main()
 
     while(1)
     {
-        IplImage* frame = cvCreateImage(cvSize(752,480),8,3);
-        IplImage* img_hsv = cvCreateImage(cvSize(752,480),8,3);
-        IplImage* threshy = cvCreateImage(cvSize(752,480),8,1);
+        Mat frame = Mat(Size(752,480),CV_8UC3);
+        Mat img_hsv = Mat(Size(752,480),CV_8UC3);
+        Mat threshy = Mat(Size(752,480),CV_8UC1);
         getFrame(hCam, frame);
-        cvCvtColor(frame,img_hsv,CV_BGR2HSV);
-        cvInRangeS(img_hsv, cvScalar(0, 120, 100), cvScalar(255, 255, 255), threshy);
-        cvSmooth(threshy,threshy,CV_MEDIAN,7,7);
+        cvtColor(frame,img_hsv,CV_BGR2HSV);
+        inRange(img_hsv, Scalar(0, 120, 100), Scalar(255, 255, 255), threshy);
+        // smooth(threshy,threshy,CV_MEDIAN,7,7);
         for(int i = 0 ; i < 752 ; i++)
         {
             for(int j = 0 ; j < 480 ; j++)
                 {
-                    if(returnPixel1C(threshy,i,j) == 0)
-                        returnPixel1C(threshy,i,j) = 255;
+                    if(threshy.at<uchar>(i,j) == 0)
+                        threshy.at<uchar>(i,j) = 255;
                     else
-                        returnPixel1C(threshy,i,j) = 0;
+                        threshy.at<uchar>(i,j) = 0;
                 }
         }
-        CvMemStorage* compstorage;
-        compstorage = cvCreateMemStorage(0);
-        CvContour* contours;
-        cvFindContours( threshy, compstorage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE );
-        for( int i = 0; i < contours->total; i++ ) 
-        {
-            double xc, yc, rc;
-            double rMajor, rMinor;
-            fitEllipse(contours,&xc,&yc,&rMajor,&rMinor);
-            rc = rMajor;
-            cvEllipse(frame,cvPoint(xc,yc),cvSize(rMajor,rMinor),0,0,360,cvScalar(255,255,0));
+        
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+        findContours( threshy, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+        /// Find the rotated rectangles and ellipses for each contour
+        vector<RotatedRect> minRect( contours.size() );
+        vector<RotatedRect> minEllipse( contours.size() );
+        for( int i = 0; i < contours.size(); i++ )
+        { minRect[i] = minAreaRect( Mat(contours[i]) );
+            if( contours[i].size() > 5 )
+            { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
         }
 
-        cvClearMemStorage(compstorage);
+        Mat drawing = Mat( frame.size(), CV_8UC3 );
+        for( int i = 0; i< contours.size(); i++ )
+            {
+            Scalar color = Scalar( 255,255,0 );
+            // contour
+            drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
+            // ellipse
+            ellipse( drawing, minEllipse[i], color, 2, 8 );
+            // rotated rectangle
+            Point2f rect_points[4]; minRect[i].points( rect_points );
+            for( int j = 0; j < 4; j++ )
+                line( drawing, rect_points[j], rect_points[(j+1)%4], color, 1, 8 );
+            }
 
-        cvShowImage("frame",frame);
-        cvShowImage("threshed",threshy);
-        int c = cvWaitKey(10);
+        imshow("live",img_hsv);
+        imshow("threshy",threshy);
+        imshow("drawing",drawing);
+
+        int c = cvWaitKey();
         if( c == 27 )
             break;
-        cvReleaseImage(&frame);
-        cvReleaseImage(&img_hsv);
-        cvReleaseImage(&threshy);
+        // cvReleaseImage(&frame);
+        // cvReleaseImage(&img_hsv);
+        // cvReleaseImage(&threshy);
     }
     return 0;
 }

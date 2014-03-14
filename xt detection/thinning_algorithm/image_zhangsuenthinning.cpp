@@ -7,8 +7,8 @@ needed as a precomputation before LSD (Linear Time Line Segment Detector)
 Reference [3]: http://www.ipol.im/pub/art/2012/gjmr-lsd/article.pdf
 Reference [4]: http://www.ipol.im/pub/art/2012/gjmr-lsd/
 
-MAKE SURE-> when the image is not square segmentation fault occurs
-            I dont't know why -> (NEED TO FIGURE OUT ????)
+MAKE SURE-> when the image is not square, segmentation fault occurs
+            dont't know why -> (NEED TO FIGURE OUT ????)
 
 NOTE->      number of iterations can be varied but it has been seen that
             after a point no effect is occuring on the image
@@ -75,7 +75,7 @@ int main(int argc, char const *argv[])
 {
 	if(argc < 2)
 	{
-		printf("Usage: \n%s <Filename>\n", argv[0]);
+		printf("Usage: \n%s <FILENAME>\n", argv[0]);
 		exit(1);
 	}
 	IplImage* frame = cvLoadImage(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
