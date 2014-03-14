@@ -130,8 +130,10 @@ int main()
         IplImage* img_hsv = cvCreateImage(cvSize(752,480),8,3);
         IplImage* threshy = cvCreateImage(cvSize(752,480),8,1);
         getFrame(hCam, frame);
-        cvCvtColor(frame,img_hsv,CV_BGR2HSV);
-        cvInRangeS(img_hsv, cvScalar(0, 120, 100), cvScalar(255, 255, 255), threshy);
+        cvCvtColor(frame,img_hsv,CV_BGR2YUV);
+        cvInRangeS(img_hsv, cvScalar(13, 114, 107), cvScalar(35, 136, 150), threshy);
+        // cvErode(threshy,threshy);
+        // cvDilate(threshy,threshy);
         cvSmooth(threshy,threshy,CV_MEDIAN,7,7);
         for(int i = 0 ; i < 752 ; i++)
         {
@@ -144,13 +146,13 @@ int main()
                 }
         }
         CvMemStorage* storage = cvCreateMemStorage(0);
-        CvSeq* results = cvHoughCircles(threshy,storage,CV_HOUGH_GRADIENT,1,threshy->width/10,100,20,0,100);
+        CvSeq* results = cvHoughCircles(threshy,storage,CV_HOUGH_GRADIENT,1,threshy->width/10,100,20,0,50);
         for( int i = 0; i < results->total; i++ ) 
         {
             float* p = (float*) cvGetSeqElem( results, i );
             CvPoint pt = cvPoint( cvRound( p[0] ), cvRound( p[1] ) );
-            cvCircle(frame,pt,5,cvScalar(255,255,0),2,8);
-            cvCircle(frame,pt,cvRound( p[2] ),CV_RGB(0,0,255),CV_FILLED);
+            cvCircle(frame,pt,2,cvScalar(255,255,0),2,8);
+            cvCircle(frame,pt,cvRound( p[2] ),CV_RGB(0,0,255),1,8);
             printf("FOUND\n");
         }
 
