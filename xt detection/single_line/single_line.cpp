@@ -124,7 +124,7 @@ double linevector_distance(line_data linevector1, line_data linevector2)
 	return distance/4.0;
 }
 
-double linevector_displacement(line_data linevector1, line_data = linevector2)
+double linevector_displacement(line_data linevector1, line_data linevector2)
 {
 	double displacement;
 	displacement = min(distance_point2point(linevector1.x1,linevector1.y1,linevector2.x1,linevector2.y1),displacement);
