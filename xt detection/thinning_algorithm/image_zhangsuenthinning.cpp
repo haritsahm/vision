@@ -80,7 +80,8 @@ int main(int argc, char const *argv[])
 	}
 	IplImage* frame = cvLoadImage(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
     // cvNot(frame,frame);
-    cvInRangeS(frame,cvScalar(180,0,0),cvScalar(255,0,0),frame);                            //segmenting white part (cvScalar values have been chosen arbitrarily)
+    cvInRangeS(frame,cvScalar(150,0,0),cvScalar(255,0,0),frame);                            //segmenting white part (cvScalar values have been chosen arbitrarily)
+    cvSaveImage("test.bmp", frame);
     cvShowImage("frame",frame);
     cvWaitKey();
 	for (int i = 0; i < number_of_iterations; ++i)
