@@ -81,7 +81,7 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < frame->height; ++j)
 		{
 			int xu, yu;
-			undistort_barrel(376 - i, 240 - j, &xu, &yu);
+			undistort_regression(376 - i, 240 - j, &xu, &yu);
 			xu = 376 - xu;
 			yu = 240 - yu;
 			if(xu < undistorted->width && yu < undistorted->height && xu > 0 && yu > 0)
