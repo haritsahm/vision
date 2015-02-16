@@ -103,6 +103,8 @@ CamError CamCapture::init()
         return CAM_FAILURE;
     }
 
+    // nRet = is_SetWhiteBalance (hCam, IS_SET_WB_ILLUMINANT_A);
+
     double newFPS;
     nRet = is_SetFrameRate(hCam, 60.0, &newFPS);
     printf("FPS is set to %lf\n", newFPS);

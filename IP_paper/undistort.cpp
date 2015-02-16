@@ -59,7 +59,7 @@ void undistort_regression(int xd, int yd, int* xu, int* yu)
     *yu = (int)(ru*sin(angu) + 0.5);
 }
 
-double ax = -7.1e-06;										//distortion constants at which the fisheye image looks linear*/
+double ax = -8.1e-06;										//distortion constants at which the fisheye image looks linear*/
 void undistort_barrel(int xd, int yd, int* xu, int* yu)		//function to convert image coordinates from distorted fisheye
 {															//image to image coordinates from undistorted linear image
 	double r2 = xd*xd +yd*yd;	
@@ -81,7 +81,7 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < frame->height; ++j)
 		{
 			int xu, yu;
-			undistort_regression(376 - i, 240 - j, &xu, &yu);
+			undistort_barrel(376 - i, 240 - j, &xu, &yu);
 			xu = 376 - xu;
 			yu = 240 - yu;
 			if(xu < undistorted->width && yu < undistorted->height && xu > 0 && yu > 0)

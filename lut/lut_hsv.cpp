@@ -108,9 +108,9 @@ int exitCam(HIDS hCam)
 
 int main(int argc, char const *argv[])
 {
-    // HIDS hCam = 1;
-    // initializeCam(hCam);
-    // setImgMem(hCam);
+    HIDS hCam = 1;
+    initializeCam(hCam);
+    setImgMem(hCam);
     IplImage *frame = cvCreateImage(cvSize(752, 480), 8, 3);
     IplImage *img_hsv = cvCreateImage(cvSize(752, 480), 8, 3);
     IplImage *threshy = cvCreateImage(cvSize(752, 480), 8, 1);
@@ -129,7 +129,7 @@ int main(int argc, char const *argv[])
     cvCreateTrackbar("Vh","sliders",&vh,255,0);
     while(1)
     {
-        // getFrame(hCam, frame);
+        getFrame(hCam, frame);
         cvCvtColor(frame, img_hsv, CV_BGR2HSV);
         cvInRangeS(img_hsv, cvScalar(hl, sl, vl), cvScalar(hh, sh, vh), threshy);
         cvShowImage("threshy", threshy);
