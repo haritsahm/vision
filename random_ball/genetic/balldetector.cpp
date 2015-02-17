@@ -23,7 +23,10 @@ balldetector::balldetector(IplImage* img)
 		int pos1 = rand1() * (double) edge_count;
 		int pos2 = rand1() * (double) edge_count;
 		int pos3 = rand1() * (double) edge_count;
-		candidatePopulation[i] = get3PointCircle(edgePoints[pos1], edgePoints[pos2], edgePoints[pos3]);
+		candidatePopulation[i].pt1 = edgePoints[pos1];
+		candidatePopulation[i].pt2 = edgePoints[pos2];
+		candidatePopulation[i].pt3 = edgePoints[pos3];
+		candidateCircles[i] = get3PointCircle(candidatePopulation[i]);
 	}
 }
 
@@ -37,14 +40,14 @@ double balldetector::rand2()
 	return rand1()*2 - 1;
 }
 
-Circle balldetector::get3PointCircle(CvPoint pi, CvPoint pj, CvPoint pk)
+CircleFeat balldetector::get3PointCircle(Circle c)
 {
-	double xi = pi.x;
-	double yi = pi.y;
-	double xj = pj.x;
-	double yj = pj.y;
-	double xk = pk.x;
-	double yk = pk.y;
+	double xi = c.pt1.x;
+	double yi = c.pt1.y;
+	double xj = c.pt2.x;
+	double yj = c.pt2.y;
+	double xk = c.pt3.x;
+	double yk = c.pt3.y;
 	double x0, y0, r;
 	double ri = (xi*xi + yi*yi);
 	double rj = (xj*xj + yj*yj);
@@ -58,15 +61,15 @@ Circle balldetector::get3PointCircle(CvPoint pi, CvPoint pj, CvPoint pk)
 
 	r = sqrt((xi - x0)*(xi - x0) + (yi - y0)*(yi - y0));
 
-	Circle c;
-	c.x = (int) x0;
-	c.y = (int) y0;
-	c.r = (int) r;
+	CircleFeat c0;
+	c0.x = (int) x0;
+	c0.y = (int) y0;
+	c0.r = (int) r;
 
-	return c;
+	return c0;
 }
 
-void balldetector::addToTestSet(CvPoint p, Circle c)
+void balldetector::addToTestSet(CvPoint p, CircleFeat c)
 {
 	int x = c.x + p.x;
 	int y = c.y - p.y;
@@ -78,7 +81,7 @@ void balldetector::addToTestSet(CvPoint p, Circle c)
 	Ns++;
 }
 
-void balldetector::generateTestSet(Circle c)
+void balldetector::generateTestSet(CircleFeat c)
 {
 	testSet.clear();
 	Ns = 0;
@@ -107,10 +110,8 @@ void balldetector::generateTestSet(Circle c)
 	}
 }
 
-double balldetector::fitnessValue(Circle c)
+double balldetector::fitnessValue(CircleFeat c)
 {
-	if(!isValidCircle(c))
-		return 0.0001;
 	generateTestSet(c);
 	double fitVal = 0.0;
 	int countPos = 0;
@@ -132,7 +133,7 @@ void balldetector::updateFitness()
 	double normFactor = 0.0;
 	for (int i = 0; i < POPULATION_SIZE; ++i)
 	{
-		fitnessPopulation[i] = fitnessValue(candidatePopulation[i]);
+		fitnessPopulation[i] = fitnessValue(candidateCircles[i]);
 		normFactor += fitnessPopulation[i];
 	}
 	//Normalising
@@ -142,16 +143,12 @@ void balldetector::updateFitness()
 
 void balldetector::computeRouletteProb()
 {
-	rouletteWheel[0] = 1.0/fitnessPopulation[0];
+	rouletteWheel[0] = fitnessPopulation[0];
 	double sum = rouletteWheel[0];
 	for (int i = 1; i < POPULATION_SIZE; ++i)
 	{
-		rouletteWheel[i] = rouletteWheel[i-1] + 1.0/fitnessPopulation[i];
+		rouletteWheel[i] = rouletteWheel[i-1] + fitnessPopulation[i];
 		sum += rouletteWheel[i];
-	}
-	for (int i = 0; i < POPULATION_SIZE; ++i)
-	{
-		rouletteWheel[i] /= sum;
 	}
 }
 
@@ -166,29 +163,31 @@ Circle balldetector::chooseFromPopulation()
 	return candidatePopulation[0];
 }
 
-Circle balldetector::crossover(Circle &c1, Circle &c2)
+Circle balldetector::crossover(Circle c1, Circle c2)
 {
-	Circle dominant, recessive, offspring;
-	if(fitnessValue(c1) > fitnessValue(c2))
-	{
-		dominant = c1;
-		recessive = c2;
-	}
-	else
-	{
-		dominant = c2;
-		recessive = c1;
-	}
-	double x1 = dominant.x;
-	double y1 = dominant.y;
-	double r1 = dominant.r;
-	double x2 = recessive.x;
-	double y2 = recessive.y;
-	double r2 = recessive.r;
+	if(rand1() > CROSSOVER_PROBABILITY)
+		return c1;
+	vector<CvPoint> arr1;
+	vector<CvPoint> arr2;
+	vector<CvPoint> arr3;
 
-	offspring.x = x1 + rand2()*(x1 - x2);
-	offspring.y = y1 + rand2()*(y1 - y2);
-	offspring.r = r1 + rand2()*(r1 - r2);
+	arr1.push_back(c1.pt1);
+	arr1.push_back(c1.pt2);
+	arr1.push_back(c1.pt3);
+	arr2.push_back(c2.pt1);
+	arr2.push_back(c2.pt2);
+	arr2.push_back(c2.pt3);
+
+	int pos = rand1()*3.0;
+	for (int i = 0; i < pos; ++i)
+		arr3.push_back(arr1[i]);
+	for (int i = pos; i < 3; ++i)
+		arr3.push_back(arr2[i]);
+
+	Circle offspring;
+	offspring.pt1 = arr3[0];
+	offspring.pt2 = arr3[1];
+	offspring.pt3 = arr3[2];
 	return offspring;
 }
 
@@ -196,15 +195,19 @@ void balldetector::mutate(Circle &c)
 {
 	if(rand1() > MUTATION_PROBABILITY)
 		return;
-	int offsetx = ((rand2())*MUTATION_STEP);
-	int offsety = ((rand2())*MUTATION_STEP);
-	int offsetr = ((rand2())*MUTATION_STEP);
-	c.x += offsetx;
-	c.y += offsety;
-	c.r += offsetr;
+	int pos = rand1() * (double) edge_count;
+	c.pt1 = edgePoints[pos];
+	if(rand1() > MUTATION_PROBABILITY)
+		return;
+	pos = rand1() * (double) edge_count;
+	c.pt2 = edgePoints[pos];
+	if(rand1() > MUTATION_PROBABILITY)
+		return;
+	pos = rand1() * (double) edge_count;
+	c.pt3 = edgePoints[pos];
 }
 
-bool balldetector::isValidCircle(Circle c)
+bool balldetector::isValidCircle(CircleFeat c)
 {
 	if(c.x <= 0 || c.x >= IMAGE_WIDTH)
 		return false;
@@ -218,7 +221,7 @@ void balldetector::findBall()
 	int gen = 0;
 	while(gen < GENERATIONS)
 	{
-		// printf("generation: %d\n", gen);
+		printf("generation: %d\n", gen);
 		updateFitness();
 		computeRouletteProb();
 		Circle nextGeneration[POPULATION_SIZE];
@@ -234,7 +237,7 @@ void balldetector::findBall()
 			}
 		}
 		nextGeneration[0] = eliteIndiv;
-		bestCandidate = eliteIndiv;
+		bestCandidate = get3PointCircle(eliteIndiv);
 
 		for (int i = 1; i < POPULATION_SIZE; ++i)
 		{
@@ -242,9 +245,13 @@ void balldetector::findBall()
 			Circle c2 = chooseFromPopulation();
 			Circle offspring = crossover(c1, c2);
 			mutate(offspring);
+			nextGeneration[i] = offspring;
 		}
 		for (int i = 0; i < POPULATION_SIZE; ++i)
+		{
 			candidatePopulation[i] = nextGeneration[i];
+			candidateCircles[i] = get3PointCircle(nextGeneration[i]);
+		}
 		gen++;
 	}
 	printf("fitVal: %lf\n", fitnessValue(bestCandidate));
@@ -260,8 +267,8 @@ void balldetector::drawPopulation()
 {
 	for (int i = 0; i < POPULATION_SIZE; ++i)
 	{
-		cvCircle(debug, cvPoint(candidatePopulation[i].x, candidatePopulation[i].y), 2, CV_RGB(255, 255, 255));
-		// printf("x: %d y: %d\n", candidatePopulation[i].x, candidatePopulation[i].y);
+		cvCircle(debug, cvPoint(candidateCircles[i].x, candidateCircles[i].y), 2, CV_RGB(255, 255, 255));
+		// printf("x: %d y: %d\n", candidateCircles[i].x, candidateCircles[i].y);
 	}
 }
 
