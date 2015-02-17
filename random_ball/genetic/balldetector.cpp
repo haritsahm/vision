@@ -1,6 +1,6 @@
 #include "balldetector.h"
 
-balldetector::balldetector(IplImage* img)
+BallDetector::BallDetector(IplImage* img)
 {
 	srand(time(NULL));
 	canny_image = img;
@@ -17,6 +17,7 @@ balldetector::balldetector(IplImage* img)
 	}
 
 	edge_count = edgePoints.size();
+	printf("edge_count: %d\n", edge_count);
 
 	for (int i = 0; i < POPULATION_SIZE; ++i)
 	{
@@ -30,17 +31,17 @@ balldetector::balldetector(IplImage* img)
 	}
 }
 
-double balldetector::rand1()
+double BallDetector::rand1()
 {
 	return ((double)rand() / (double) RAND_MAX);
 }
 
-double balldetector::rand2()
+double BallDetector::rand2()
 {
 	return rand1()*2 - 1;
 }
 
-CircleFeat balldetector::get3PointCircle(Circle c)
+CircleFeat BallDetector::get3PointCircle(Circle c)
 {
 	double xi = c.pt1.x;
 	double yi = c.pt1.y;
@@ -69,7 +70,7 @@ CircleFeat balldetector::get3PointCircle(Circle c)
 	return c0;
 }
 
-void balldetector::addToTestSet(CvPoint p, CircleFeat c)
+void BallDetector::addToTestSet(CvPoint p, CircleFeat c)
 {
 	int x = c.x + p.x;
 	int y = c.y - p.y;
@@ -81,7 +82,7 @@ void balldetector::addToTestSet(CvPoint p, CircleFeat c)
 	Ns++;
 }
 
-void balldetector::generateTestSet(CircleFeat c)
+void BallDetector::generateTestSet(CircleFeat c)
 {
 	testSet.clear();
 	Ns = 0;
@@ -110,7 +111,7 @@ void balldetector::generateTestSet(CircleFeat c)
 	}
 }
 
-double balldetector::fitnessValue(CircleFeat c)
+double BallDetector::fitnessValue(CircleFeat c)
 {
 	generateTestSet(c);
 	double fitVal = 0.0;
@@ -118,7 +119,20 @@ double balldetector::fitnessValue(CircleFeat c)
 
 	for (int i = 0; i < Ns; ++i)
 	{
-		if(returnPixel1C(canny_image, testSet[i].x, testSet[i].y) == 255)
+		int x = testSet[i].x - 2;
+		int y = testSet[i].y - 2;
+		bool flag = false;
+		for (; x < testSet[i].x + 3; ++x)
+		{
+			for (; y < testSet[i].y + 3; ++y)
+			{
+				if(!isValidPoint(x, y))
+					continue;
+				if(returnPixel1C(canny_image, x, y) == 255)
+					flag = true;
+			}
+		}
+		if(flag)
 			countPos++;
 	}
 
@@ -128,7 +142,7 @@ double balldetector::fitnessValue(CircleFeat c)
 	return fitVal;
 }
 
-void balldetector::updateFitness()
+void BallDetector::updateFitness()
 {
 	double normFactor = 0.0;
 	for (int i = 0; i < POPULATION_SIZE; ++i)
@@ -141,7 +155,7 @@ void balldetector::updateFitness()
 		fitnessPopulation[i] /= normFactor;
 }
 
-void balldetector::computeRouletteProb()
+void BallDetector::computeRouletteProb()
 {
 	rouletteWheel[0] = fitnessPopulation[0];
 	double sum = rouletteWheel[0];
@@ -152,7 +166,7 @@ void balldetector::computeRouletteProb()
 	}
 }
 
-Circle balldetector::chooseFromPopulation()
+Circle BallDetector::chooseFromPopulation()
 {
 	double prob = rand1();
 	for (int i = 0; i < POPULATION_SIZE; ++i)
@@ -163,7 +177,7 @@ Circle balldetector::chooseFromPopulation()
 	return candidatePopulation[0];
 }
 
-Circle balldetector::crossover(Circle c1, Circle c2)
+Circle BallDetector::crossover(Circle c1, Circle c2)
 {
 	if(rand1() > CROSSOVER_PROBABILITY)
 		return c1;
@@ -191,7 +205,7 @@ Circle balldetector::crossover(Circle c1, Circle c2)
 	return offspring;
 }
 
-void balldetector::mutate(Circle &c)
+void BallDetector::mutate(Circle &c)
 {
 	if(rand1() > MUTATION_PROBABILITY)
 		return;
@@ -207,7 +221,7 @@ void balldetector::mutate(Circle &c)
 	c.pt3 = edgePoints[pos];
 }
 
-bool balldetector::isValidCircle(CircleFeat c)
+bool BallDetector::isValidCircle(CircleFeat c)
 {
 	if(c.x <= 0 || c.x >= IMAGE_WIDTH)
 		return false;
@@ -216,7 +230,16 @@ bool balldetector::isValidCircle(CircleFeat c)
 	return true;
 }
 
-void balldetector::findBall()
+bool BallDetector::isValidPoint(int x, int y)
+{
+	if(x <= 0 || x >= IMAGE_WIDTH)
+		return false;
+	if(y < 0 || y >= IMAGE_HEIGHT)
+		return false;
+	return true;
+}
+
+void BallDetector::findBall()
 {
 	int gen = 0;
 	while(gen < GENERATIONS)
@@ -263,7 +286,7 @@ void balldetector::findBall()
 	cvWaitKey();
 }
 
-void balldetector::drawPopulation()
+void BallDetector::drawPopulation()
 {
 	for (int i = 0; i < POPULATION_SIZE; ++i)
 	{
@@ -272,7 +295,7 @@ void balldetector::drawPopulation()
 	}
 }
 
-void balldetector::drawTestSet()
+void BallDetector::drawTestSet()
 {
 	cvZero(debug);
 	for (int i = 0; i < Ns; ++i)

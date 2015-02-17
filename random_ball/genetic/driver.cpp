@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
 	}
 	IplImage *img = cvLoadImage(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	cvShowImage("img", img);
-	balldetector b(img);
+	BallDetector b(img);
 	b.findBall();
 	// Circle c;
 	// c.x = 100;

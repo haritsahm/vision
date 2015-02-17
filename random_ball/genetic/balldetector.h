@@ -36,11 +36,11 @@ struct CircleFeat
 	int r;
 };
 
-class balldetector
+class BallDetector
 {
 	static const int POPULATION_SIZE = 70;
-	static const double CROSSOVER_PROBABILITY = 0.40;
-	static const double MUTATION_PROBABILITY = 0.10;
+	static const double CROSSOVER_PROBABILITY = 0.50;
+	static const double MUTATION_PROBABILITY = 0.20;
 	static const int MUTATION_STEP = 10;
 	static const int GENERATIONS = 35;
 	static const int ELITE_INDIV_COUNT = 1;
@@ -60,8 +60,8 @@ class balldetector
 	double rouletteWheel[POPULATION_SIZE];
 	CircleFeat bestCandidate;
 public:
-	balldetector(IplImage *img);
-	// ~balldetector();
+	BallDetector(IplImage *img);
+	// ~BallDetector();
 	
 	double rand1();									//returns value between 0 - 1
 	double rand2();									//returns value between -1 - 1
@@ -75,6 +75,7 @@ public:
 	Circle crossover(Circle c1, Circle c2);
 	void mutate(Circle &c);
 	bool isValidCircle(CircleFeat c);
+	bool isValidPoint(int x, int y);
 	void findBall();
 	void drawPopulation();
 	void drawTestSet();
