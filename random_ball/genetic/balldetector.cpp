@@ -66,6 +66,14 @@ CircleFeat BallDetector::get3PointCircle(Circle c)
 	c0.x = (int) x0;
 	c0.y = (int) y0;
 	c0.r = (int) r;
+	// if(x0 < 0 || y0 < 0 || r < 0)
+	// {
+	// 	CircleFeat c1;
+	// 	c1.x = 0;
+	// 	c1.y = 0;
+	// 	c1.r = 0;
+	// 	return c1;
+	// }
 
 	return c0;
 }
@@ -116,15 +124,14 @@ double BallDetector::fitnessValue(CircleFeat c)
 	generateTestSet(c);
 	double fitVal = 0.0;
 	int countPos = 0;
-
 	for (int i = 0; i < Ns; ++i)
 	{
-		int x = testSet[i].x - 2;
-		int y = testSet[i].y - 2;
+		int x = testSet[i].x - 1;
+		int y = testSet[i].y - 1;
 		bool flag = false;
-		for (; x < testSet[i].x + 3; ++x)
+		for (; x < testSet[i].x + 2; ++x)
 		{
-			for (; y < testSet[i].y + 3; ++y)
+			for (; y < testSet[i].y + 2; ++y)
 			{
 				if(!isValidPoint(x, y))
 					continue;
@@ -139,6 +146,8 @@ double BallDetector::fitnessValue(CircleFeat c)
 	fitVal = (double) countPos/(double) Ns;
 	if(c.r < MIN_RADIUS)
 		fitVal *= (0.01 * (double) c.r)/(double) MIN_RADIUS;
+	if(c.r > MAX_RADIUS)
+		fitVal *= (0.01 * (double) MAX_RADIUS)/(double) c.r;
 	return fitVal;
 }
 

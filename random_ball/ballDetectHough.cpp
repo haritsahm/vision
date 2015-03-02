@@ -125,9 +125,11 @@ int main(int argc, char const *argv[])
 		cvCvtColor(frame, img_hsv, CV_BGR2HSV);
 		cvInRangeS(img_hsv, cvScalar(50, 49, 8), cvScalar(79, 130, 96), img_green);
 		// cvGaussianBlur(img_green, img_green, cvSize(9, 9), 2, 2);
+		cvDilate(img_green, img_green);
 		cvSmooth( img_green, img_green, CV_GAUSSIAN, 7, 7 );
-		cvNot(img_green, img_green);
-		cvCanny(img_green, canny_edge, 10, 100, 3);
+		// cvFloodFill(img_green, cvPoint(376, 240), CV_RGB(255,255,255));
+		// cvNot(img_green, img_green);
+		cvCanny(img_green, canny_edge, 1, 200, 5);
 		cvSetImageROI(img_green, cvRect(40, 40, 500, 400));
 		CvMemStorage* storage = cvCreateMemStorage(0);
 		CvSeq* circles = cvHoughCircles(img_green, storage, CV_HOUGH_GRADIENT, 1, 100, 100, 20,10,40);
@@ -150,6 +152,8 @@ int main(int argc, char const *argv[])
 		int c = cvWaitKey(10);
 		if(c == 27)
 			exit(0);
+		if(c == 's' || c == 'S')
+			cvSaveImage("test5.bmp", canny_edge);
 		cvResetImageROI(img_green);
 	}
 	return 0;

@@ -42,9 +42,10 @@ class BallDetector
 	static const double CROSSOVER_PROBABILITY = 0.50;
 	static const double MUTATION_PROBABILITY = 0.20;
 	static const int MUTATION_STEP = 10;
-	static const int GENERATIONS = 35;
+	static const int GENERATIONS = 30;
 	static const int ELITE_INDIV_COUNT = 1;
-	static const int MIN_RADIUS = 50;
+	static const int MIN_RADIUS = 40;
+	static const int MAX_RADIUS = 200;
 
 	int IMAGE_HEIGHT;
 	int IMAGE_WIDTH;
