@@ -157,7 +157,7 @@ int main()
                 // // cout<<"\n2";                                        
                 // //Thresholding the frame for yellow
                 // // inRange(img_hsv, Scalar(10, 135, 20), Scalar(255, 199, 120), threshy); 
-                cvInRangeS(img_hsv, cvScalar(0, 150, 90), cvScalar(120, 242, 255), threshy);
+                cvInRangeS(img_hsv, cvScalar(18, 145, 28), cvScalar(43, 255, 137), threshy);
                 // cvInRangeS(img_hsv, cvScalar(45, 133, 70), cvScalar(117, 160, 115), threshy);
                 cvErode(threshy,threshy);
                 cvDilate(threshy,threshy);                                     
