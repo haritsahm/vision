@@ -44,8 +44,8 @@ void thinningZhangSuenIteration(bool testcase[testcase_height][testcase_width], 
             bool p8 = testcase[i][j-1];
             bool p9 = testcase[i-1][j-1];
 
-            int A  = (p2 == 0 && p3 == 1) + (p3 == 0 && p4 == 1) + 
-                     (p4 == 0 && p5 == 1) + (p5 == 0 && p6 == 1) + 
+            int A  = (p2 == 0 && p3 == 1) + (p3 == 0 && p4 == 1) +
+                     (p4 == 0 && p5 == 1) + (p5 == 0 && p6 == 1) +
                      (p6 == 0 && p7 == 1) + (p7 == 0 && p8 == 1) +
                      (p8 == 0 && p9 == 1) + (p9 == 0 && p2 == 1);
             int B  = p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9;
@@ -77,7 +77,7 @@ void thinningZhangSuenIteration(bool testcase[testcase_height][testcase_width], 
     }
 }
 
-main(void)
+int main()
 {
 	IplImage* sample = cvCreateImage(cvSize(testcase_width*10,testcase_height*10), 8, 3);
 	IplImage* iteration = cvCreateImage(cvSize(testcase_width*10,testcase_height*10), 8, 3);
@@ -101,7 +101,7 @@ main(void)
     {
         printf("iteration : %d\n", i + 1);
         thinningZhangSuenIteration(testcase,0,iteration);
-        thinningZhangSuenIteration(testcase,1,iteration);        
+        thinningZhangSuenIteration(testcase,1,iteration);
         cvWaitKey();
     }
     cvWaitKey();

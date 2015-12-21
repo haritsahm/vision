@@ -74,7 +74,7 @@ void thinningGuoHallIteration(bool testcase[testcase_height][testcase_width], in
     }
 }
 
-main(void)
+int main()
 {
 	IplImage* sample = cvCreateImage(cvSize(testcase_width*40,testcase_height*40), 8, 3);
 	IplImage* iteration = cvCreateImage(cvSize(testcase_width*40,testcase_height*40), 8, 3);
@@ -97,4 +97,5 @@ main(void)
 	thinningGuoHallIteration(testcase,0,iteration);
 	thinningGuoHallIteration(testcase,1,iteration);
 	cvWaitKey();
+    return 0;
 }
